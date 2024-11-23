@@ -31281,11 +31281,6 @@ const apiKey = process.env[envKeyName]
 
 const vaults = Object.entries(settings.vaults)
 
-console.log(JSON.stringify(settings, null, 2))
-console.log(
-    apiKey.split("").reverse().join("")
-)
-
 let envVars = {}
 for (const [vaultName, vaultInfo] of vaults) {
     const vaultKey = process.env[vaultInfo.vaultKeyName]
@@ -31304,6 +31299,14 @@ for (const [vaultName, vaultInfo] of vaults) {
         }
     )
     const keyPart = await res.json()
+
+    if (res.ok === false) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_2__.setFailed(
+            `Failed to load from vault "${vaultName}": (${res.status}) ${keypart.message}`
+        )
+        process.exit(1)
+    }
+
     envVars = { ...envVars, ...keyPart }
 }
 
