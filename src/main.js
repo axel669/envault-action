@@ -46,7 +46,7 @@ for (const [vaultName, vaultInfo] of vaults) {
 
     if (res.ok === false) {
         core.setFailed(
-            `Failed to load from vault "${vaultName}": (${res.status}) ${keypart.message}`
+            `Failed to load from vault "${vaultName}": (${res.status}) ${keyPart.message}`
         )
         process.exit(1)
     }

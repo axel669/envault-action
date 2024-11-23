@@ -31302,7 +31302,7 @@ for (const [vaultName, vaultInfo] of vaults) {
 
     if (res.ok === false) {
         _actions_core__WEBPACK_IMPORTED_MODULE_2__.setFailed(
-            `Failed to load from vault "${vaultName}": (${res.status}) ${keypart.message}`
+            `Failed to load from vault "${vaultName}": (${res.status}) ${keyPart.message}`
         )
         process.exit(1)
     }
