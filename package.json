@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "action.js",
-  "type": "module",
   "scripts": {
     "build": "esbuild src/main.js --bundle --outfile=action.js --platform=node"
   },
