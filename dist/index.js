@@ -31281,6 +31281,11 @@ const apiKey = process.env[envKeyName]
 
 const vaults = Object.entries(settings.vaults)
 
+console.log(JSON.stringify(settings, null, 2))
+console.log(
+    apiKey.split("").reverse().join("")
+)
+
 let envVars = {}
 for (const [vaultName, vaultInfo] of vaults) {
     const vaultKey = process.env[vaultInfo.vaultKeyName]
