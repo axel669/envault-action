@@ -5,11 +5,12 @@
   "main": "action.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "esbuild src/main.js --bundle --outfile=action.js --platform=node"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.11.1"
+    "@actions/core": "^1.11.1",
+    "esbuild": "^0.24.0"
   }
 }
