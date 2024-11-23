@@ -1,0 +1,7 @@
+name: ENVault Action
+description: Setup environment variables using ENVault
+inputs: {}
+outputs: {}
+runs:
+  using: node20
+  main: action.js
