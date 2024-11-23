@@ -25652,6 +25652,13 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/prom
 
 /***/ }),
 
+/***/ 6760:
+/***/ ((module) => {
+
+module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
+
+/***/ }),
+
 /***/ 7075:
 /***/ ((module) => {
 
@@ -27380,6 +27387,9 @@ module.exports = parseParams
 /***/ 6972:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   Ay: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
 /* unused harmony exports CORE_SCHEMA, DEFAULT_SCHEMA, FAILSAFE_SCHEMA, JSON_SCHEMA, Schema, Type, YAMLException, dump, load, loadAll, safeDump, safeLoad, safeLoadAll, types */
 
 /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
@@ -31230,7 +31240,7 @@ var jsYaml = {
 	safeDump: safeDump
 };
 
-/* unused harmony default export */ var __WEBPACK_DEFAULT_EXPORT__ = ((/* unused pure expression or super */ null && (jsYaml)));
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (jsYaml);
 
 
 
@@ -31240,20 +31250,63 @@ var jsYaml = {
 /***/ ((__webpack_module__, __unused_webpack___webpack_exports__, __nccwpck_require__) => {
 
 __nccwpck_require__.a(__webpack_module__, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(3430);
-/* harmony import */ var js_yaml__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6972);
-/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1455);
+/* harmony import */ var node_fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1455);
+/* harmony import */ var node_path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6760);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(3430);
+/* harmony import */ var js_yaml__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(6972);
 
 
 
 
-_actions_core__WEBPACK_IMPORTED_MODULE_0__.exportVariable("envault_success", "true")
-console.log(process.cwd())
-console.log(
-    await node_fs_promises__WEBPACK_IMPORTED_MODULE_2__.readdir(
-        process.cwd()
-    )
+
+
+const hash = async (text) => {
+    const bytes = await new Blob([text]).arrayBuffer()
+    const hashBytes = await crypto.subtle.digest("SHA-512", bytes)
+    return Array.from(
+        new Uint8Array(hashBytes),
+        (byte) => byte.toString(16).padStart(2, "0")
+    ).join("")
+}
+
+const target = node_path__WEBPACK_IMPORTED_MODULE_1__.resolve(process.cwd(), "envault.yml")
+const settings = js_yaml__WEBPACK_IMPORTED_MODULE_3__/* ["default"].load */ .Ay.load(
+    await node_fs_promises__WEBPACK_IMPORTED_MODULE_0__.readFile(target, "utf8")
 )
+
+const envKeyName = settings.apiKeyName ?? "envault_key"
+const apiURL = new URL("/api/env", settings.origin).href
+
+const apiKey = process.env[envKeyName]
+
+const vaults = Object.entries(settings.vaults)
+
+let envVars = {}
+for (const [vaultName, vaultInfo] of vaults) {
+    const vaultKey = process.env[vaultInfo.vaultKeyName]
+    const key = await hash(vaultKey)
+    const res = await fetch(
+        `${apiURL}/${vaultName}`,
+        {
+            method: "POST",
+            headers: {
+                "api-key": apiKey,
+            },
+            body: JSON.stringify({
+                vaultKey: key,
+                keys: vaultInfo.keys,
+            }),
+        }
+    )
+    const keyPart = await res.json()
+    envVars = { ...envVars, ...keyPart }
+}
+
+for (const [key, value] of Object.entries(envVars)) {
+    console.log("Setting ENV Var:", key)
+    _actions_core__WEBPACK_IMPORTED_MODULE_2__.exportVariable(key, value)
+    _actions_core__WEBPACK_IMPORTED_MODULE_2__.setSecret(value)
+}
 
 __webpack_async_result__();
 } catch(e) { __webpack_async_result__(e); } }, 1);
